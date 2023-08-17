@@ -1,6 +1,7 @@
-﻿
-    internal class CommandLineArgs
-    {
+﻿namespace Task;
+
+internal class CommandLineArgs
+{
     public string FilePath { get; private set; }
     public string OutputMode { get; private set; }
 
@@ -8,8 +9,8 @@
     {
         if (args.Length > 2)
             throw new ArgumentException();
+
         FilePath = args[0];
         OutputMode = args[1];
     }
 }
-

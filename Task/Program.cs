@@ -1,17 +1,16 @@
 ﻿using System.Diagnostics;
 using System.Text;
 
-namespace Taski
+namespace Task
 {
     internal class Program
     {
         private static readonly DateTime Now = DateTime.Now;
 
-        private static async Task Main(string[] args)
+        private static async System.Threading.Tasks.Task Main(string[] args)
         {
-
             var commandLineArguments = new CommandLineArgs(args);
-            
+
             while (true)
             {
                 var resource = commandLineArguments.FilePath;
@@ -31,7 +30,7 @@ namespace Taski
                 try
                 {
                     await WriteBytesFromResource(resource, filePath);
-                    
+
                     responseLog.AppendLine("Status code: 200");
                 }
                 catch (Exception ex)
@@ -46,37 +45,41 @@ namespace Taski
                     await WriteLogsInFile(fileForLogs, result.ToString());
                     await WriteLogsInFile(responseLogPath, responseLog.ToString());
                 }
+
                 if (!ExitOrContinue())
                     break;
             }
         }
-        public static string GetLogsDirectoryPath()
+
+        private static string GetLogsDirectoryPath()
         {
             var folderPath = Directory.GetCurrentDirectory();
             if (!Directory.Exists(folderPath))
             {
                 Directory.CreateDirectory(folderPath);
             }
+
             return folderPath;
         }
-        public async static Task WriteBytesFromResource(string resource, string filePath)
+
+        private static async System.Threading.Tasks.Task WriteBytesFromResource(string resource, string filePath)
         {
             using var client = new HttpClient();
             var output = await client.GetByteArrayAsync(resource);
             await File.WriteAllBytesAsync(filePath, output);
         }
-        public static async Task WriteLogsInFile(string fileName, string textToWrite)
+
+        private static async System.Threading.Tasks.Task WriteLogsInFile(string fileName, string textToWrite)
         {
             await File.WriteAllTextAsync(fileName, textToWrite);
         }
-        public static bool ExitOrContinue()
+
+        private static bool ExitOrContinue()
         {
             Console.WriteLine("Press 'Q' to exit the program or any other key to continue running the program");
             var key = Console.ReadKey().Key;
-            if (key == ConsoleKey.Q)
-                return false;
-            else
-                return true;
+
+            return key != ConsoleKey.Q;
         }
     }
 }
