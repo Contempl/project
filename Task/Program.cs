@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Text;
 
 namespace Taski
 {
@@ -8,33 +9,84 @@ namespace Taski
 
         private static async Task Main(string[] args)
         {
-            if (args.Length < 1 || args.Length > 2)
-            {
-                Console.WriteLine("Wrong input, debil");
-                return;
-            }
-            var resource = args[0];
-            var defaultName = $"{args[0].Replace("https://", string.Empty)}_request_{Now}.log";
-            var fileName = args.Length == 2 ? args[1] : defaultName;
 
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
-            try
+            var commandLineArguments = new CommandLineArgs(args);
+            
+            while (true)
             {
-                using var client = new HttpClient();
-                var output = await client.GetStringAsync(resource);
-                await File.WriteAllTextAsync(fileName, output);
-                Console.WriteLine("Status code: 200");
+                var resource = commandLineArguments.FilePath;
+                var defaultName = $"{args[0].Replace("https://", string.Empty)}_request_{Now}.log";
+                var fileName = args.Length == 2 ? commandLineArguments.OutputMode : defaultName;
+                var responseLog = new StringBuilder();
+                var result = new StringBuilder();
+
+                var logsDirectoryPath = GetLogsDirectoryPath();
+
+                var filePath = Path.Combine(logsDirectoryPath, fileName);
+                var fileForLogs = Path.Combine(logsDirectoryPath, "logs.txt");
+                var responseLogPath = Path.Combine(logsDirectoryPath, "response.log");
+
+                var stopwatch = new Stopwatch();
+                stopwatch.Start();
+                try
+                {
+                    await WriteBytesFromResource(resource, filePath);
+                    
+                    responseLog.AppendLine("Status code: 200");
+                }
+                catch (Exception ex)
+                {
+                    result.Append($"\nElectric. We are electric... and your request failed: {ex.Message}");
+                }
+                finally
+                {
+                    stopwatch.Stop();
+                    result.Append($"\nRequest took {stopwatch.ElapsedMilliseconds} ms");
+
+                    await WriteLogsInFile(fileForLogs, result.ToString());
+                    await WriteLogsInFile(responseLogPath, responseLog.ToString());
+                }
+                if (!ExitOrContinue())
+                    break;
             }
-            catch (Exception ex)
+        }
+        public static string GetLogsDirectoryPath()
+        {
+            var folderPath = Directory.GetCurrentDirectory();
+            if (!Directory.Exists(folderPath))
             {
-                Console.WriteLine($"Electric. We are electric... and your request failed {ex.Message}");
+                Directory.CreateDirectory(folderPath);
             }
-            finally
-            {
-                stopwatch.Stop();
-                Console.WriteLine($"Request took {stopwatch.ElapsedMilliseconds} ms");
-            }
+            return folderPath;
+        }
+        public async static Task WriteBytesFromResource(string resource, string filePath)
+        {
+            using var client = new HttpClient();
+            var output = await client.GetByteArrayAsync(resource);
+            await File.WriteAllBytesAsync(filePath, output);
+        }
+        public static async Task WriteLogsInFile(string fileName, string textToWrite)
+        {
+            await File.WriteAllTextAsync(fileName, textToWrite);
+        }
+        public static bool ExitOrContinue()
+        {
+            Console.WriteLine("Press 'Q' to exit the program or any other key to continue running the program");
+            var key = Console.ReadKey().Key;
+            if (key == ConsoleKey.Q)
+                return false;
+            else
+                return true;
         }
     }
 }
+//create iteration2
+// Change writing strings to files. (must take Stream and write bytes directly to file)
+// Change logging in console to logging in other file. (Write logs in file instead of console)
+// Change logic in creating files. directory: <date>_request
+// file1(has request response): response.log
+// file2(system info): logs.log
+
+// Program shouldn't end after the 1st request and must exist until we stop using it
+
+//create this as pull request in 'development'
