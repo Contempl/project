@@ -9,7 +9,6 @@ namespace Task
 
         private static async System.Threading.Tasks.Task Main(string[] args)
         {
-
             var commandLineArguments = new CommandLineArgs(args);
             var fileSystem = new FileSystem();
             var myHttpClient = new MyHttpClient();

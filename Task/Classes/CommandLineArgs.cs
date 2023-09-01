@@ -13,4 +13,3 @@ public class CommandLineArgs
         OutputMode = args[1];
     }
 }
-
