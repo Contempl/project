@@ -5,26 +5,24 @@ namespace Task.Classes
 {
     public class Process //conductor of the orchestra
     {
-        private IMyHttpClient _myHttpClient;
-        private IFileSystem _fileSystem;
+        private readonly IMyHttpClient _myHttpClient;
+        private readonly IFileSystem _fileSystem;
 
         public Process(IMyHttpClient myHttpClient, IFileSystem fileSystem)
         {
             _myHttpClient = myHttpClient;
             _fileSystem = fileSystem;
         }
-        public async System.Threading.Tasks.Task Do(CommandLineArgs commandLineArguments, string[] args, DateTime now)
+        
+        public async System.Threading.Tasks.Task Do(CommandLineArgs commandLineArguments, DateTime now)
         {
             var resource = commandLineArguments.FilePath;
-            var defaultName = $"{args[0].Replace("https://", string.Empty)}_request_{now}.log";
-            var fileName = args.Length == 2 ? commandLineArguments.OutputMode : defaultName;
 
             var responseLog = new StringBuilder();
             var result = new StringBuilder();
 
             var logsDirectoryPath = _fileSystem.GetLogsDirectoryPath();
 
-            var filePath = Path.Combine(logsDirectoryPath, fileName);
             var fileForLogs = Path.Combine(logsDirectoryPath, "logs.txt");
             var responseLogPath = Path.Combine(logsDirectoryPath, "response.log");
 
@@ -32,18 +30,21 @@ namespace Task.Classes
             stopwatch.Start();
             try
             {
-                await _myHttpClient.WriteBytesFromResource(resource);
+                var bytes = await _myHttpClient.WriteBytesFromResource(resource); // test that this is called always with correct resource
 
-                responseLog.AppendLine("Status code: 200");
+                responseLog.AppendLine("Status code: 200"); // test
+
+                await _myHttpClient.LogToDatabase(now); // test the same time is used
             }
             catch (Exception ex)
             {
                 result.Append($"\nElectric. We are electric... and your request failed: {ex.Message}");
+                // test that correct ex.Message is used
             }
             finally
             {
                 stopwatch.Stop();
-                result.Append($"\nRequest took {stopwatch.ElapsedMilliseconds} ms");
+                result.Append($"\n{now:MM/dd/yyyy}: Request took {stopwatch.ElapsedMilliseconds} ms."); // test that correct time format is used
 
                 await _fileSystem.WriteLogsInFile(fileForLogs, result.ToString());
                 await _fileSystem.WriteLogsInFile(responseLogPath, responseLog.ToString());

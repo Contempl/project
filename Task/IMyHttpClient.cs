@@ -2,6 +2,8 @@
 {
     public interface IMyHttpClient
     {
-        public System.Threading.Tasks.Task<byte[]> WriteBytesFromResource(string resource);
+        public Task<byte[]> WriteBytesFromResource(string resource);
+
+        public System.Threading.Tasks.Task LogToDatabase(DateTime exceptionOccuredAt);
     }
 }

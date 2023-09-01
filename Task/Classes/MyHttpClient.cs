@@ -8,5 +8,10 @@
             var output = await client.GetByteArrayAsync(resource);
             return output;
         }
+
+        public System.Threading.Tasks.Task LogToDatabase(DateTime exceptionOccuredAt)
+        {
+            return System.Threading.Tasks.Task.CompletedTask;
+        }
     }
 }

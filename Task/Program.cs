@@ -13,7 +13,7 @@ namespace Task
             var fileSystem = new FileSystem();
             var myHttpClient = new MyHttpClient();
             var process = new Classes.Process(myHttpClient,fileSystem);
-            await process.Do(commandLineArguments, args, Now);
+            await process.Do(commandLineArguments, Now);
         }
     }
 }
