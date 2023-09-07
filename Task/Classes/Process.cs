@@ -30,7 +30,7 @@ namespace Task.Classes
             stopwatch.Start();
             try
             {
-                var bytes = await _myHttpClient.WriteBytesFromResource(resource); // test that this is called always with correct resource
+                var bytes = await _myHttpClient.WriteBytesFromResource(resource); // fix {bytes} usage and test that this is always called with correct resource
 
                 responseLog.AppendLine("Status code: 200"); // test
 
