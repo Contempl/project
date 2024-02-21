@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Task": {
+      "commandName": "Project",
+      "commandLineArgs": "https://yandex.ru lakadMatatag"
+    }
+  }
+}
