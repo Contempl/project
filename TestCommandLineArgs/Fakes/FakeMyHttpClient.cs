@@ -9,11 +9,11 @@ public class FakeMyHttpClient : IMyHttpClient
 
     public Task<byte[]> WriteBytesFromResource(string resource)
     {
-        throw new NotImplementedException();
+        return (Task<byte[]>)System.Threading.Tasks.Task.CompletedTask;
     }
 
     public System.Threading.Tasks.Task LogToDatabase(DateTime exceptionOccuredAt)
     {
-        throw new NotImplementedException();
+        return System.Threading.Tasks.Task.CompletedTask;
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections;
+using System.Diagnostics;
 using System.Text;
 
 namespace Task.Classes
@@ -20,18 +21,21 @@ namespace Task.Classes
 
             var responseLog = new StringBuilder();
             var result = new StringBuilder();
+            var bytesArray = new byte[0];
 
             var logsDirectoryPath = _fileSystem.GetLogsDirectoryPath();
 
             var fileForLogs = Path.Combine(logsDirectoryPath, "logs.txt");
             var responseLogPath = Path.Combine(logsDirectoryPath, "response.log");
+            var fileForDataPath = Path.Combine(logsDirectoryPath, "data.txt");
 
             var stopwatch = new Stopwatch();
             stopwatch.Start();
             try
             {
                 var bytes = await _myHttpClient.WriteBytesFromResource(resource); // test that this is called always with correct resource
-
+                Console.WriteLine(bytes.Length.ToString());
+                bytesArray = bytes;
                 responseLog.AppendLine("Status code: 200"); // test
 
                 await _myHttpClient.LogToDatabase(now); // test the same time is used
@@ -48,6 +52,8 @@ namespace Task.Classes
 
                 await _fileSystem.WriteLogsInFile(fileForLogs, result.ToString());
                 await _fileSystem.WriteLogsInFile(responseLogPath, responseLog.ToString());
+                await _fileSystem.WriteDataToFile(fileForDataPath, bytesArray);
+                Console.WriteLine(responseLog.ToString());
             }
         }
 

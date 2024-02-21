@@ -14,6 +14,6 @@ public class FakeFileSystem : IFileSystem
 
     public System.Threading.Tasks.Task WriteLogsInFile(string fileName, string textToWrite)
     {
-        throw new NotImplementedException();
-    }
+		return System.Threading.Tasks.Task.CompletedTask;
+	}
 }
